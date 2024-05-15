@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import { readDataFromFirebaseCollection } from '@/lib/firebase/read/readData';
 import { updateKeyAndValueFromDocument, deleteHotelDocument} from '@/lib/firebase/update/updateData';
 import Link from 'next/link';
-
+import {ImagesList} from '@/lib/classes/hotelDetails';
 export default function HotelPage({ params }: { params: { hotelSlug: string } }) {
   const [hotelDetails, setHotelDetails] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [updatedHotelDetails, setUpdatedHotelDetails] = useState<any>({});
-  // const router = useRouter();
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+
 
   useEffect(() => {
     async function fetchData() {
@@ -62,6 +63,24 @@ export default function HotelPage({ params }: { params: { hotelSlug: string } })
       console.error('Failed to delete hotel document:', data.error);
     }
   };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const fileList = Array.from(files);
+      setImageFiles(fileList);
+      const imageList: ImagesList[] = fileList.map((file: File) => ({
+        imageId: Date.now().toString(),
+        imageUrl: URL.createObjectURL(file),
+        imageTitle: file.name,
+      }));
+      setUpdatedHotelDetails((prevDetails: any) => ({
+        ...prevDetails,
+        hotelImagesList: imageList,
+      }));
+    }
+  };
+  
   
   return (
     <div className="container mx-auto py-10 px-4">
@@ -75,8 +94,20 @@ export default function HotelPage({ params }: { params: { hotelSlug: string } })
         alt={hotelDetails?.hotelName || 'Hotel Image'}
         className="rounded-lg shadow-lg w-full h-auto"
       />
+       {!isEditing && hotelDetails?.hotelImagesList && hotelDetails?.hotelImagesList.length > 0 && (
+  <div className="grid grid-cols-3 gap-4 m-4">
+    {hotelDetails?.hotelImagesList.map((image: ImagesList) => (
+      <div key={image.imageId} className="relative bg-cover bg-center w-full aspect-video rounded-lg p-4" style={{ backgroundImage: `url(${image.imageUrl})` }}>
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-black bg-opacity-50 text-white">
+        </div>
+      </div>
+    ))}
+  </div>
+)}
     </div>
     <div className="space-y-4 mt-12 pt-2">
+   
+
       <h1 className="text-3xl font-bold mb-4">{hotelDetails?.hotelName || 'Loading...'}</h1>
       {isEditing ? (
         <>
@@ -89,6 +120,10 @@ export default function HotelPage({ params }: { params: { hotelSlug: string } })
           <input type="text" name="hotelEmailId" value={updatedHotelDetails.hotelEmailId} onChange={handleChange} placeholder="Email Id" className="input-field" />
           <input type="text" name="hotelImageUrl" value={updatedHotelDetails.hotelImageUrl} onChange={handleChange} placeholder="Hotel Image URL" className="input-field" />
           <input type="text" name="hotelStarRating" value={updatedHotelDetails.hotelStarRating} onChange={handleChange} placeholder="Star Rating" className="input-field" />           
+          
+          <input type="file" multiple accept="image/*" onChange={handleImageChange} className="input-field" />
+
+          
           <button onClick={handleSave} className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 mx-1">Save</button>
           <button onClick={handleDelete} className="bg-red-500 text-white py-2 px-4 rounded-lg mt-4 mx-1"><Link href="/hotels">Delete</Link></button>
         </>

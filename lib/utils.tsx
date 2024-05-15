@@ -7,6 +7,7 @@ import { db } from "@/lib/firebase/firebaseConfig";
 import { addHotelDetailsInFirebaseCollection } from "@/lib/firebase/create/createData";
 import { HotelDetails } from "@/lib/classes/hotelDetails";
 import Link from "next/link";
+import {ImagesList} from '@/lib/classes/hotelDetails';
 
 export const HotelsData = () => {
   const [hotels, setHotels] = useState([]);
@@ -71,6 +72,22 @@ export const AddNewHotelForm = () => {
       ...prevData,
       [name]: value,
     }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const fileList = Array.from(files);
+      const imageList: ImagesList[] = fileList.map((file: File) => ({
+        imageId: Date.now().toString(),
+        imageUrl: URL.createObjectURL(file),
+        imageTitle: file.name,
+      }));
+      setFormData((prevData) => ({
+        ...prevData,
+        hotelImagesList: imageList,
+      }));
+    }
   };
 
   const handleSubmit = async () => {
@@ -164,6 +181,13 @@ export const AddNewHotelForm = () => {
         }
         onChange={handleInputChange}
         placeholder="Hotel Star Rating"
+        className="input-field"
+      />
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={handleImageChange}
         className="input-field"
       />
       <button
