@@ -6,14 +6,13 @@ export const metadata: Metadata = {
   description: "Staybook Task Application",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function ({ children }: {children: React.ReactNode}) {
   return (
     <html lang="en">
       <body>
+        <div className="border-b py-3 m-1 text-center bg-green-200 font-bold text-xl">
+          Stay Book
+        </div>
         <main>{children}</main>
       </body>
     </html>

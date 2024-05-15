@@ -1,9 +1,39 @@
-/* 
-    implement function to update individual key and value fields from the firebase document
-    handle number and string value updation in the same function
-    update the updatedAt time with the same format when any key gets updated in the document
-*/
-export const updateKeyAndValueFromDocument = () => {};
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import { HOTEL_DETAILS_DB_COLLECTION } from "../../constants";
 
-// implement function to update the object inside the hotelImagesList from the firebase document
-export const updateObjectsIndsideArray = () => {};
+export const updateKeyAndValueFromDocument = async (
+  hotelSlug: string,
+  updatedFields: any
+) => {
+  console.log(hotelSlug, updatedFields);
+  const docRef = doc(db, HOTEL_DETAILS_DB_COLLECTION, hotelSlug);
+
+  try {
+    // Get the current document data
+    const docSnap = await getDoc(docRef);
+    const currentData: any = docSnap.data();
+    console.log("geeress", currentData)
+
+    // Merge the new data with the current data
+    const newData = { ...currentData, ...updatedFields };
+    console.log("New Data:", newData);
+
+
+    // Update the document with the merged data
+    await updateDoc(docRef, newData);
+    console.log("Update successful")
+    return {
+      status: "OK",
+      data: {
+        message: `Document ${hotelSlug} updated successfully.`,
+      },
+    };
+  } catch (error: any) {
+    console.log(error)
+    return {
+      status: "FAILED",
+      data: { error: error?.message || error },
+    };
+  }
+};
