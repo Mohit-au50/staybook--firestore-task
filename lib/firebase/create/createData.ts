@@ -7,7 +7,7 @@ export const addHotelDetailsInFirebaseCollection = async (
   hotelData: HotelDetails
 ): Promise<{ status: string; data: any }> => {
 
-  hotelData.hotelSlug = `staybook-hotel-${hotelData.hotelName}-${hotelData.hotelCity.toLowerCase()}`;
+  hotelData.hotelSlug = `staybook-hotel-${hotelData.hotelName.replace(/\s/g, '')}-${hotelData.hotelCity.toLowerCase()}`;
   const docRef = doc(db, collectionName, hotelData.hotelSlug);
 
   try {

@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { HOTEL_DETAILS_DB_COLLECTION } from "../../constants";
 
@@ -31,6 +31,26 @@ export const updateKeyAndValueFromDocument = async (
     };
   } catch (error: any) {
     console.log(error)
+    return {
+      status: "FAILED",
+      data: { error: error?.message || error },
+    };
+  }
+};
+
+export const deleteHotelDocument = async (hotelSlug: string) => {
+  const docRef = doc(db, HOTEL_DETAILS_DB_COLLECTION, hotelSlug);
+
+  try {
+    await deleteDoc(docRef);
+    console.log("check")
+    return {
+      status: "OK",
+      data: {
+        message: `Document ${hotelSlug} deleted successfully.`,
+      },
+    };
+  } catch (error: any) {
     return {
       status: "FAILED",
       data: { error: error?.message || error },
