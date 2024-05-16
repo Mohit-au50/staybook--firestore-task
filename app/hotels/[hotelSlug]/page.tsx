@@ -5,6 +5,8 @@ import { readDataFromFirebaseCollection } from '@/lib/firebase/read/readData';
 import { updateKeyAndValueFromDocument, deleteHotelDocument} from '@/lib/firebase/update/updateData';
 import Link from 'next/link';
 import {ImagesList} from '@/lib/classes/hotelDetails';
+import Image from 'next/image';
+
 export default function HotelPage({ params }: { params: { hotelSlug: string } }) {
   const [hotelDetails, setHotelDetails] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -89,7 +91,7 @@ export default function HotelPage({ params }: { params: { hotelSlug: string } })
     <Link href="/hotels">
         < div className="block mb-4 text-blue-500">&larr; Back to Main Page</div>
       </Link>
-      <img
+      <Image
         src={hotelDetails?.hotelImageUrl || '/placeholder.jpg'}
         alt={hotelDetails?.hotelName || 'Hotel Image'}
         className="rounded-lg shadow-lg w-full h-auto"
