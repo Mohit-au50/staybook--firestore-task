@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Staybook Task Application",
 };
 
-export default function ({ children }: {children: React.ReactNode}) {
+export default function Main({ children }: {children: React.ReactNode}) {
   return (
     <html lang="en">
       <body>
