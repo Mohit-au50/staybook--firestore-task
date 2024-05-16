@@ -7,6 +7,7 @@ import { db } from "@/lib/firebase/firebaseConfig";
 import { addHotelDetailsInFirebaseCollection } from "@/lib/firebase/create/createData";
 import { HotelDetails } from "@/lib/classes/hotelDetails";
 import Link from "next/link";
+import { format } from 'date-fns';
 import {ImagesList} from '@/lib/classes/hotelDetails';
 
 export const HotelsData = () => {
@@ -62,9 +63,16 @@ export const AddNewHotelForm = () => {
     hotelPincode: "",
     hotelSlug: "",
     hotelImagesList: [],
-    createdAt: "",
-    updatedAt: "",
+    createdAt: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+    updatedAt: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
   });
+
+  useEffect(() => {
+    setFormData(prevData => ({
+      ...prevData,
+      createdAt: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+    }));
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -96,7 +104,7 @@ export const AddNewHotelForm = () => {
       formData
     );
     if (res.status === "OK") {
-      // Handle success
+      alert("Your Hotel is successfully added");
     }
   };
 
