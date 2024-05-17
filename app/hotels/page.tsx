@@ -1,27 +1,66 @@
+"use client"; 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase/firebaseConfig";
 
-export default function page() {
+export default function HotelsPage() {
+  const [hotels, setHotels] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        const hotelsCollection = collection(db, "hotelDetails");
+        const querySnapshot = await getDocs(hotelsCollection);
+        const fetchedHotels = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setHotels(fetchedHotels);
+      } catch (error) {
+        setError(error.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotels();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <section className="w-full h-screen">
+    <section className="w-full h-screen bg-gray-100">
       <div className="container mx-auto h-full py-10">
         <div className="flex items-center justify-between py-4">
           <h1 className="text-2xl font-bold tracking-wide">All Hotels List</h1>
           <Link
-            href={"/hotels/addNewHotel"}
+            href="/hotels/addNewHotel"
             className="p-2 px-4 bg-green-100 text-green-800 font-medium tracking-wide rounded"
           >
             Add New Hotel
           </Link>
         </div>
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {/* fetch the actual hotelDocuments here and map them */}
-          {Array.from({ length: 9 }).map((_, index) => (
-            <Link
-              href={`/hotels/hotel-${index}`}
-              key={index}
-              className="bg-green-500 w-full aspect-video rounded-lg p-4"
-            >
-              hotel details of {index}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {hotels.map((hotel, index) => (
+            <Link href={`/hotels/${hotel.id}`} key={index}>
+              <div
+                className="relative bg-cover bg-center bg-no-repeat w-full h-64 rounded-lg overflow-hidden cursor-pointer"
+                style={{ backgroundImage: `url(${hotel.hotelImageUrl})` }}
+              >
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+                  <h2 className="text-white font-bold text-xl">{hotel.hotelName}</h2>
+                  <p className="text-gray-200">{hotel.hotelCity}, {hotel.hotelState}</p>
+                </div>
+              </div>
             </Link>
           ))}
         </div>

@@ -34,3 +34,5 @@ export class ImagesList {
   imageUrl: string = "";
   imageTitle: string = "";
 }
+
+

@@ -9,49 +9,44 @@ export const addHotelDetailsInFirebaseCollection = async (
   console.log("collectionName >>", collectionName);
   console.log("hotelData >>", hotelData);
 
-  // your document collection reference
+  // Your document collection reference
   const docRef = doc(db, collectionName, hotelData.hotelSlug);
 
   try {
-    const isExsist = await getDoc(docRef);
-    // if a document already exsits with the hotel slug then return an object with error
-    if (isExsist.exists()) {
+    const docSnap = await getDoc(docRef);
+    // If a document already exists with the hotel slug, then return an object with an error
+    if (docSnap.exists()) {
       return {
         status: "FAILED",
         data: {
-          error: `document already exsist with the slug provide ${hotelData.hotelSlug}`,
+          error: `Document already exists with the provided slug: ${hotelData.hotelSlug}`,
         },
       };
     }
 
-    // create a new instance of the hotelDetails class into data variable
-    let data = new HotelDetails();
+    // Set the data accordingly
+    const data: HotelDetails = {
+      hotelName: hotelData.hotelName,
+      hotelEmailId: hotelData.hotelEmailId,
+      hotelContactNumber: hotelData.hotelContactNumber,
+      hotelStarRating: hotelData.hotelStarRating,
+      hotelImageUrl: hotelData.hotelImageUrl,
+      hotelAddress: hotelData.hotelAddress,
+      hotelState: hotelData.hotelState,
+      hotelCity: hotelData.hotelCity,
+      hotelPincode: hotelData.hotelPincode,
+      hotelSlug: hotelData.hotelSlug,
+      hotelImagesList: hotelData.hotelImagesList,
+    };
 
-    // set the data accordingly
-    data.hotelName = hotelData.hotelName;
-    data.hotelEmailId = "";
-    data.hotelContactNumber = 0;
-    data.hotelStarRating = 0;
-    data.hotelImageUrl = "";
-    data.hotelAddress = "";
-    data.hotelState = "";
-    data.hotelCity = "";
-    data.hotelPincode = "";
-    data.hotelSlug = "";
-    data.hotelImagesList = [];
+    // Add the document to the Firebase database
+    await setDoc(docRef, data);
 
-    // you can leave createdAt and updatedAt because they will have the current time by default which is specified in the classModel
-    // data.createdAt = "";
-    // data.updatedAt = "";
-
-    // finally add the document in the firebase database
-    const res = await setDoc(docRef, data);
-
-    // return the success message
+    // Return the success message
     return {
       status: "OK",
       data: {
-        message: `document added with id ${hotelData.hotelSlug}`,
+        message: `Document added with id ${hotelData.hotelSlug}`,
       },
     };
   } catch (error: any) {
