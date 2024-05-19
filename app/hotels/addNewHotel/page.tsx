@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import dashify from "dashify";
 import { addHotelDetailsInFirebaseCollection } from "../../../lib/firebase/create/createData";
 import { HotelDetails, ImagesList } from "@/lib/classes/hotelDetails";
-import { format } from "date-fns"; // Import format function from date-fns
-
-type HotelDetailsKeys = keyof HotelDetails;
+import { format } from "date-fns";
 
 export default function AddNewHotelPage() {
   const router = useRouter();
@@ -38,7 +36,19 @@ export default function AddNewHotelPage() {
   const handleAddImage = () => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      hotelImagesList: [...prevFormData.hotelImagesList, new ImagesList()],
+      hotelImagesList: [
+        ...prevFormData.hotelImagesList,
+        { imageId: generateUUID(), imageUrl: "", imageTitle: "" },
+      ],
+    }));
+  };
+
+  const handleImageChange = (index: number, key: string, value: string) => {
+    const newImagesList = [...formData.hotelImagesList];
+    newImagesList[index] = { ...newImagesList[index], [key]: value };
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      hotelImagesList: newImagesList,
     }));
   };
 
@@ -51,14 +61,12 @@ export default function AddNewHotelPage() {
     }
     const hotelSlug = dashify(`${formData.hotelName}-${formData.hotelCity}`);
     const updatedFormData = { ...formData, hotelSlug };
-  
+
     const res = await addHotelDetailsInFirebaseCollection("hotels", updatedFormData);
-    console.log("got result");
-    console.log(res);
-  
+
     if (res.status === "OK") {
       console.log("Hotel added successfully");
-      router.push('/hotels');
+      router.push("/hotels");
     } else {
       console.error(res.data.error);
     }
@@ -68,44 +76,58 @@ export default function AddNewHotelPage() {
     <div className="container mx-auto">
       <h1 className="text-2xl font-bold mb-4">Add New Hotel</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {Object.keys(formData).map((key) => (
-          (key !== "hotelSlug" && key !== "createdAt" && key !== "updatedAt" && key !== "hotelImagesList") && (
-            <div key={key} className="flex flex-col">
-              <label className="mb-2 capitalize" htmlFor={key}>{key}</label>
-              <input
-                type={
-                  key === "hotelContactNumber" || key === "hotelStarRating" || key === "hotelPincode"
-                    ? "number"
-                    : "text"
-                }
-                id={key}
-                name={key}
-                value={(formData as any)[key]}
-                onChange={handleChange}
-                className="p-2 border border-gray-300 rounded"
-              />
-            </div>
-          )
-        ))}
+        {Object.keys(formData).map(
+          (key) =>
+            key !== "hotelSlug" &&
+            key !== "createdAt" &&
+            key !== "updatedAt" &&
+            key !== "hotelImagesList" && (
+              <div key={key} className="flex flex-col">
+                <label className="mb-2 capitalize" htmlFor={key}>
+                  {key}
+                </label>
+                <input
+                  type={
+                    key === "hotelContactNumber" ||
+                    key === "hotelStarRating" ||
+                    key === "hotelPincode"
+                      ? "number"
+                      : "text"
+                  }
+                  id={key}
+                  name={key}
+                  value={(formData as any)[key]}
+                  onChange={handleChange}
+                  className="p-2 border border-gray-300 rounded"
+                />
+              </div>
+            )
+        )}
         <div className="flex flex-col">
           <label className="mb-2 capitalize">Hotel Images</label>
           {formData.hotelImagesList.map((image, index) => (
-            <input
-              key={index}
-              type="text"
-              value={image.imageUrl}
-              onChange={(e) => {
-                const newImagesList = [...formData.hotelImagesList];
-                newImagesList[index].imageUrl = e.target.value;
-                setFormData((prevFormData) => ({
-                  ...prevFormData,
-                  hotelImagesList: newImagesList,
-                }));
-              }}
-              className="p-2 border border-gray-300 rounded mb-2"
-            />
+            <div key={index} className="mb-2">
+              <input
+                type="text"
+                placeholder="Image URL"
+                value={image.imageUrl}
+                onChange={(e) => handleImageChange(index, "imageUrl", e.target.value)}
+                className="p-2 border border-gray-300 rounded mb-2"
+              />
+              <input
+                type="text"
+                placeholder="Image Title"
+                value={image.imageTitle}
+                onChange={(e) => handleImageChange(index, "imageTitle", e.target.value)}
+                className="p-2 border border-gray-300 rounded"
+              />
+            </div>
           ))}
-          <button type="button" onClick={handleAddImage} className="px-4 py-2 bg-blue-500 text-white rounded">
+          <button
+            type="button"
+            onClick={handleAddImage}
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+          >
             Add Image
           </button>
         </div>
@@ -116,3 +138,13 @@ export default function AddNewHotelPage() {
     </div>
   );
 }
+
+// Utility function to generate UUID
+const generateUUID = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+

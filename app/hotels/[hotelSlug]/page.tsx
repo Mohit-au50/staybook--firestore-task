@@ -1,33 +1,18 @@
-// individal hotel page, user will get redirected here from the hotels page
-
-// export default function page({ params }: { params: { hotelSlug: string } }) {
-//   return (
-//     <div className="text-xl">
-//       Update Individual hotel Details of <strong>{params.hotelSlug}</strong>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getHotelDetailsBySlug } from "../../../lib/firebase/create/createData"; // Assuming you have this function
-import { HotelDetails } from "@/lib/classes/hotelDetails"; // Import the HotelDetails type
-import { updateKeyAndValueFromDocument } from "../../../lib/firebase/create/createData"; // Import the update function
+import { getHotelDetailsBySlug } from "../../../lib/firebase/create/createData";
+import { HotelDetails, ImagesList } from "@/lib/classes/hotelDetails";
+import { updateObjectsIndsideArray , updateKeyAndValueFromDocument } from "../../../lib/firebase/update/updateData";
 
-export default function HotelDetailsPage({
-  params,
-}: {
-  params: { hotelSlug: string };
-}) {
+export default function HotelDetailsPage({ params }: { params: { hotelSlug: string } }) {
   const router = useRouter();
   const [hotelDetails, setHotelDetails] = useState<HotelDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState<Partial<HotelDetails>>({}); // State for form data
-  const [updating, setUpdating] = useState<boolean>(false); // State to track updating status
+  const [formData, setFormData] = useState<Partial<HotelDetails>>({});
+  const [updating, setUpdating] = useState<boolean>(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,28 +24,36 @@ export default function HotelDetailsPage({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUpdating(true); // Set updating status to true while updating
+    setUpdating(true);
     const { hotelSlug } = params;
-    const { status, data } = await updateKeyAndValueFromDocument(
-      "hotels",
-      hotelSlug,
-      formData
-    ); // Call the update function
+    const { status, data } = await updateKeyAndValueFromDocument("hotels", hotelSlug, formData); // Call the update function
     if (status === "OK") {
-      console.log(data.message); // Log success message
       router.push('/hotels');
     } else {
-      console.error(data.error); // Log error message
+      console.error(data.error); 
     }
-    setUpdating(false); // Reset updating status after update
+    setUpdating(false);
+  };
+
+  const handleImageUpdate = (imageId: string) => {
+    const newImageUrl = prompt("Enter new image URL:");
+    const newImageTitle = prompt("Enter new image title:");
+
+    if (hotelDetails && newImageUrl && newImageTitle) {
+      const updatedHotel = updateObjectsIndsideArray(
+        hotelDetails,
+        imageId,
+        { imageUrl: newImageUrl, imageTitle: newImageTitle }
+      );
+      setHotelDetails(updatedHotel);
+      setFormData(updatedHotel);
+    }
   };
 
   useEffect(() => {
     const fetchHotelDetails = async () => {
       try {
-        // console.log("Fetching hotel details for slug:", params.hotelSlug);
         const details = await getHotelDetailsBySlug(params.hotelSlug);
-
         if (details) {
           setHotelDetails(details);
           setFormData(details);
@@ -113,6 +106,7 @@ export default function HotelDetailsPage({
               name="hotelEmailId"
               value={formData.hotelEmailId || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-4">
@@ -122,6 +116,7 @@ export default function HotelDetailsPage({
               name="hotelContactNumber"
               value={formData.hotelContactNumber || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-4">
@@ -131,6 +126,7 @@ export default function HotelDetailsPage({
               name="hotelStarRating"
               value={formData.hotelStarRating || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-4">
@@ -140,6 +136,7 @@ export default function HotelDetailsPage({
               name="hotelAddress"
               value={formData.hotelAddress || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-4">
@@ -149,6 +146,7 @@ export default function HotelDetailsPage({
               name="hotelCity"
               value={formData.hotelCity || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-4">
@@ -158,6 +156,7 @@ export default function HotelDetailsPage({
               name="hotelState"
               value={formData.hotelState || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-4">
@@ -167,6 +166,7 @@ export default function HotelDetailsPage({
               name="hotelPincode"
               value={formData.hotelPincode || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-4">
@@ -176,6 +176,7 @@ export default function HotelDetailsPage({
               name="createdAt"
               value={formData.createdAt || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-4">
@@ -185,20 +186,29 @@ export default function HotelDetailsPage({
               name="updatedAt"
               value={formData.updatedAt || ""}
               onChange={handleInputChange}
+              className="p-2 border border-gray-300 rounded"
             />
           </div>
           <h2 className="text-2xl font-semibold mb-4">Images</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {hotelDetails.hotelImagesList.map((image, index) => (
-              <img
-                key={index}
-                src={image.imageUrl}
-                alt={image.imageTitle}
-                className="w-full h-auto rounded-lg"
-              />
+              <div key={index} className="flex flex-col items-center">
+                <img
+                  src={image.imageUrl}
+                  alt={image.imageTitle}
+                  className="w-full h-auto rounded-lg"
+                />
+                <p className="mt-2 text-center text-lg font-medium">{image.imageTitle}</p>
+                <button
+                  type="button"
+                  onClick={() => handleImageUpdate(image.imageId)}
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Update Image
+                </button>
+              </div>
             ))}
           </div>
-
           <button
             type="submit"
             disabled={updating}
