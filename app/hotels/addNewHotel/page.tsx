@@ -1,41 +1,11 @@
-// import { HotelDetails } from "@/lib/classes/hotelDetails";
-// import { useState } from "react";
+"use client";
 
-/*
-    import addHotelDetailsInFirebaseCollection function here and pass hotelDetails Object
-    pass collection name and hotelData from here to the function
-*/
-// export default function AddNewHotelPage() {
-//   // const [formData, setFormData] = useState<HotelDetails>({});
-//   // you can use dashify npm package to create a hotelSlug after hotelName and hotelCity is filled
-//   // https://www.npmjs.com/package/dashify
-
-//   // handle basic data validation like number value gets added as number only not in string, email validation etc
-//   // use can use zod validations if you wish to
-
-//   // handle form submittion logic
-//   //   const handleSubmit = async () => {
-//   //     if form data is valid then call the function and add the data in firebase
-//   //     const res = await addHotelDetailsInFirebaseCollection(
-//   //       "collectionName",
-//   //       formData
-//   //     );
-//   //     hanlde redirection logic here redirect the user ot /hotels page after data is successfully added to the database
-//   //     if (res.status === "OK") {
-//   //     }
-//   //   };
-
-//   return (
-//     // add components to utilize them and reuse them insted of using a input field again and again
-//     <div>AddNewHotelPage add inputs etc to add the hotel to the firebase</div>
-//   );
-// }
-"use client"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import dashify from "dashify";
 import { addHotelDetailsInFirebaseCollection } from "../../../lib/firebase/create/createData";
-import { HotelDetails } from "@/lib/classes/hotelDetails";
+import { HotelDetails, ImagesList } from "@/lib/classes/hotelDetails";
+import { format } from "date-fns"; // Import format function from date-fns
 
 type HotelDetailsKeys = keyof HotelDetails;
 
@@ -53,8 +23,8 @@ export default function AddNewHotelPage() {
     hotelPincode: "",
     hotelSlug: "",
     hotelImagesList: [],
-    createdAt: "",
-    updatedAt: "",
+    createdAt: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+    updatedAt: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +32,13 @@ export default function AddNewHotelPage() {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
+    }));
+  };
+
+  const handleAddImage = () => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      hotelImagesList: [...prevFormData.hotelImagesList, new ImagesList()],
     }));
   };
 
@@ -110,6 +87,28 @@ export default function AddNewHotelPage() {
             </div>
           )
         ))}
+        <div className="flex flex-col">
+          <label className="mb-2 capitalize">Hotel Images</label>
+          {formData.hotelImagesList.map((image, index) => (
+            <input
+              key={index}
+              type="text"
+              value={image.imageUrl}
+              onChange={(e) => {
+                const newImagesList = [...formData.hotelImagesList];
+                newImagesList[index].imageUrl = e.target.value;
+                setFormData((prevFormData) => ({
+                  ...prevFormData,
+                  hotelImagesList: newImagesList,
+                }));
+              }}
+              className="p-2 border border-gray-300 rounded mb-2"
+            />
+          ))}
+          <button type="button" onClick={handleAddImage} className="px-4 py-2 bg-blue-500 text-white rounded">
+            Add Image
+          </button>
+        </div>
         <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
           Add Hotel
         </button>
