@@ -7,7 +7,7 @@ import { addHotelDetailsInFirebaseCollection } from "@/lib/firebase/create/creat
 import { HotelDetails, ImagesList } from "@/lib/classes/hotelDetails";
 
 export default function AddNewHotelPage() {
-  const [formData, setFormData] = useState<Partial<HotelDetails>>({});
+  const [formData, setFormData] = useState<Partial<HotelDetails & { hotelImagesListString?: string }>>({});
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
@@ -29,19 +29,21 @@ export default function AddNewHotelPage() {
       }
 
       const hotelSlug = `staybook-hotel-${dashify(`${formData.hotelName} ${formData.hotelCity}`)}`;
+      const hotelImagesList: ImagesList[] = formData.hotelImagesListString
+        ? formData.hotelImagesListString.split(',').map(url => ({
+            imageId: dashify(url),
+            imageUrl: url,
+            imageTitle: dashify(url)
+          }))
+        : [];
+
       const hotelData: HotelDetails = {
         ...new HotelDetails(),  // Create an instance of HotelDetails to ensure default values
         ...formData,
         hotelName: formData.hotelName!,
         hotelCity: formData.hotelCity!,
         hotelSlug,
-        hotelImagesList: formData.hotelImagesList
-          ? formData.hotelImagesList.split(',').map(url => ({
-              imageId: dashify(url),
-              imageUrl: url,
-              imageTitle: dashify(url)
-            }))
-          : [],
+        hotelImagesList,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -73,7 +75,7 @@ export default function AddNewHotelPage() {
           { label: "State", name: "hotelState", type: "text" },
           { label: "City", name: "hotelCity", type: "text", required: true },
           { label: "Pincode", name: "hotelPincode", type: "text" },
-          { label: "Image URLs (comma-separated)", name: "hotelImagesList", type: "text" }
+          { label: "Image URLs (comma-separated)", name: "hotelImagesListString", type: "text" }
         ].map((field, index) => (
           <div className="mb-4" key={index}>
             <label className="block text-gray-700">{field.label}:</label>
