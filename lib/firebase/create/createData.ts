@@ -37,6 +37,8 @@ export const addHotelDetailsInFirebaseCollection = async (
       hotelPincode: hotelData.hotelPincode,
       hotelSlug: hotelData.hotelSlug,
       hotelImagesList: hotelData.hotelImagesList,
+      createdAt: hotelData.createdAt || new Date().toISOString(),
+      updatedAt: hotelData.updatedAt || new Date().toISOString(),
     };
 
     // Add the document to the Firebase database
