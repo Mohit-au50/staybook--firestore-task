@@ -20,7 +20,11 @@ export default function HotelsPage() {
         }));
         setHotels(fetchedHotels);
       } catch (error) {
-        setError(error.message || "An unexpected error occurred.");
+        if (error instanceof Error) {
+          setError(error.message || "An unexpected error occurred.");
+        } else {
+          setError("An unexpected error occurred.");
+        }
       } finally {
         setLoading(false);
       }
