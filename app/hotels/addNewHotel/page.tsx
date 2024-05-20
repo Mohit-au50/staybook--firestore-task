@@ -82,11 +82,11 @@ export default function AddNewHotelPage() {
             <input
               type={field.type}
               name={field.name}
-              value={
-                field.name === "hotelImagesListString"
-                  ? formData.hotelImagesListString || ""
-                  : formData[field.name as keyof typeof formData] || ""
-              }
+              // value={
+              //   field.name === "hotelImagesListString"
+              //     ? formData.hotelImagesListString || ""
+              //     : formData[field.name as keyof typeof formData] || ""
+              // }
               onChange={handleChange}
               required={field.required}
               className="w-full px-3 py-2 border rounded-md"
