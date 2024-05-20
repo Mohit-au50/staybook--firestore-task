@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import dashify from "dashify";
 import { addHotelDetailsInFirebaseCollection } from "@/lib/firebase/create/createData";
-import { HotelDetails } from "@/lib/classes/hotelDetails";
-
-
-import { updateKeyAndValueFromDocument, updateObjectsInsideArray } from "@/lib/firebase/update/updateData";
+import { HotelDetails, ImagesList } from "@/lib/classes/hotelDetails";
 
 export default function AddNewHotelPage() {
   const [formData, setFormData] = useState<Partial<HotelDetails>>({});
@@ -33,15 +30,18 @@ export default function AddNewHotelPage() {
 
       const hotelSlug = `staybook-hotel-${dashify(`${formData.hotelName} ${formData.hotelCity}`)}`;
       const hotelData: HotelDetails = {
+        ...new HotelDetails(),  // Create an instance of HotelDetails to ensure default values
         ...formData,
         hotelName: formData.hotelName!,
         hotelCity: formData.hotelCity!,
         hotelSlug,
-        hotelImagesList: formData.hotelImagesList ? formData.hotelImagesList.split(',').map(url => ({
-          imageId: dashify(url),
-          imageUrl: url,
-          imageTitle: dashify(url)
-        })) : [],
+        hotelImagesList: formData.hotelImagesList
+          ? formData.hotelImagesList.split(',').map(url => ({
+              imageId: dashify(url),
+              imageUrl: url,
+              imageTitle: dashify(url)
+            }))
+          : [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -55,7 +55,7 @@ export default function AddNewHotelPage() {
         setError(res.data.error);
       }
     } catch (err) {
-      setError(err.message || "An unexpected error occurred.");
+      setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     }
   };
 
