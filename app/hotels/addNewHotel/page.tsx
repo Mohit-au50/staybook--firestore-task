@@ -83,9 +83,9 @@ export default function AddNewHotelPage() {
               type={field.type}
               name={field.name}
               value={
-                typeof formData[field.name as keyof typeof formData] === 'string' || typeof formData[field.name as keyof typeof formData] === 'number'
-                  ? formData[field.name as keyof typeof formData] || ""
-                  : ""
+                field.name === "hotelImagesListString"
+                  ? formData.hotelImagesListString || ""
+                  : formData[field.name as keyof typeof formData] || ""
               }
               onChange={handleChange}
               required={field.required}
