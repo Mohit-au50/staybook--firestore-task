@@ -5,11 +5,6 @@ import { getDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase/firebaseConfig";
 import { HotelDetails } from "@/lib/classes/hotelDetails";
 
-
-
-
-
-
 export default function HotelPage({ params }: { params: { hotelSlug: string } }) {
   const [hotelDetails, setHotelDetails] = useState<HotelDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -28,7 +23,11 @@ export default function HotelPage({ params }: { params: { hotelSlug: string } })
           router.push("/404");
         }
       } catch (error) {
-        setError(error.message || "An unexpected error occurred.");
+        if (error instanceof Error) {
+          setError(error.message || "An unexpected error occurred.");
+        } else {
+          setError("An unexpected error occurred.");
+        }
       } finally {
         setLoading(false);
       }
