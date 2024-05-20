@@ -82,7 +82,11 @@ export default function AddNewHotelPage() {
             <input
               type={field.type}
               name={field.name}
-              value={formData[field.name] || ""}
+              value={
+                typeof formData[field.name as keyof typeof formData] === 'string' || typeof formData[field.name as keyof typeof formData] === 'number'
+                  ? formData[field.name as keyof typeof formData] || ""
+                  : ""
+              }
               onChange={handleChange}
               required={field.required}
               className="w-full px-3 py-2 border rounded-md"
