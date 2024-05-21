@@ -27,6 +27,23 @@ export default function AddNewHotelPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    let parsedValue : string|number = value;
+
+    if (name === "hotelContactNumber" || name === "hotelStarRating" || name === "hotelPincode") {
+      parsedValue = parseInt(value, 10);
+      if (isNaN(parsedValue)) {
+        parsedValue = "";
+      }
+      else if(name === "hotelStarRating"){
+        if (!isNaN(parsedValue) && parsedValue > 10){
+          parsedValue = 10;
+          alert("Star rating cannot be more than 10.");
+        }
+      }
+    }
+
+    
+
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,

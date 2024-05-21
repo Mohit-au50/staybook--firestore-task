@@ -28,7 +28,6 @@ export default function HotelDetailsPage({ params }: { params: { hotelSlug: stri
     const { hotelSlug } = params;
     const { status, data } = await updateKeyAndValueFromDocument("hotels", hotelSlug, formData); // Call the update function
     if (status === "OK") {
-      router.push('/hotels');
     } else {
       console.error(data.error); 
     }
