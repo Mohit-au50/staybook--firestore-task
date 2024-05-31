@@ -1,5 +1,7 @@
+
 import "@/styles/globals.css";
 import type { Metadata } from "next";
+
 
 export const metadata: Metadata = {
   title: "Staybook Task",
@@ -12,9 +14,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+
     <html lang="en">
+
       <body>
-        <main>{children}</main>
+
+        <main>
+    
+          {children}
+       
+          </main>
       </body>
     </html>
   );

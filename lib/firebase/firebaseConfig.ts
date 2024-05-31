@@ -1,17 +1,20 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// copy your app config from the firebase
+
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
-  measurementId: "",
+  apiKey: "AIzaSyByd5XTphAsmjzd-IcNqOEVOmiXMxbE7F4",
+  authDomain: "staybook-task.firebaseapp.com",
+  projectId: "staybook-task",
+  storageBucket: "staybook-task.appspot.com",
+  messagingSenderId: "369102355256",
+  appId: "1:369102355256:web:a7699243e00f198f715fcd",
+  measurementId: "G-53VVLV1ER3"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+
+const db = getFirestore(app);
+
+export { db };
